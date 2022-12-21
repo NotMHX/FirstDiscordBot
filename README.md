@@ -1,4 +1,4 @@
-# token is obviously not included
+# config.json is obviously not included
 
 ## install following things before using:
 - discord.js
