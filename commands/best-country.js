@@ -15,7 +15,7 @@ module.exports = {
     if (country === "england") {
       await interaction.reply(`All right bruv you are CORRECT!`);
     } else {
-      await interaction.reply(`Stinky American.`);
+      await interaction.reply(`Stinky American.`); //Very offensive to me since I'm a American.
     }  
   },
 };

@@ -5,10 +5,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
+global.config = require("./config.json") // Makes config assessable on every file.
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+global.client = client; // Makes client assessable on every file.
 
 // ----- EVENTS HANDLER -----
 
@@ -31,7 +32,7 @@ client.commands = new Collection();
 
 
 // Log in to Discord with your client's token
-client.login(token);
+client.login(config.token);
 
 // ----- COMMAND HANDLER -----
 
