@@ -10,21 +10,30 @@ const { token } = require("./config.json");
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+// ----- EVENTS HANDLER -----
+
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
+
+
 // collection with command files
 client.commands = new Collection();
 
-// ----- LOGIN -----
-
-// When the client is ready, run this code (only once)
-// We use 'c' for the event parameter to keep it separate from the already defined 'client'
-client.once(Events.ClientReady, (c) => {
-  console.log(`Ready! Logged in as ${c.user.tag}`);
-});
 
 // Log in to Discord with your client's token
 client.login(token);
 
-// ----- GET COMMANDS AND ADD TO OBJECT -----
+// ----- COMMAND HANDLER -----
 
 // finds commands folder, where the command files are, filters only by js
 const commandsPath = path.join(__dirname, "commands");
@@ -47,30 +56,3 @@ for (const file of commandFiles) {
   }
 }
 
-// ----- COMMAND HANDLER -----
-
-// executes code when a command receives an interaction
-client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) return; // exits handler if different command type is found
-  console.log(interaction);
-
-  // gets the command name
-  const command = interaction.client.commands.get(interaction.commandName);
-
-  // throw error if no command is found
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
-  try {
-    await command.execute(interaction); // executes the command from the collection (see 'get commands')
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({
-      // throws error if execution fails
-      content: "There was an error while executing this command!",
-      ephemeral: true,
-    });
-  }
-});
